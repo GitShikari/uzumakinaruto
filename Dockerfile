@@ -1,8 +1,22 @@
-FROM risingstack/alpine:3.3-v4.2.6-1.1.3
+FROM node:18
 
-COPY package.json package.json  
+# Install FFmpeg (required for transcoding)
+RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json (if available) to install dependencies first
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Add your source files
-COPY . .  
-CMD ["npm","start"] 
+# Copy the rest of the application code
+COPY . .
+
+# Expose the port your app runs on
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "app.js"]
